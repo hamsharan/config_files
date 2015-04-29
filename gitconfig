@@ -40,7 +40,7 @@
   f = flow
   su = submodule update --init --recursive --quiet
 [user]
-  name = pitr
-  email = pitr.vern@gmail.com
+  name = hamsharan
+  email = hamsharan@gmail.com
 [branch]
 	autosetuprebase = always
