@@ -1,15 +1,9 @@
-# print SQL to STDOUT
-if ENV.include?('RAILS_ENV') && !Object.const_defined?('RAILS_DEFAULT_LOGGER')
-  require 'logger'
-  RAILS_DEFAULT_LOGGER = Logger.new(STDOUT)
-end
-
 # Autocomplete
 require 'irb/completion'
 
 IRB.conf[:PROMPT_MODE] = :SIMPLE
 
-%w[rubygems looksee wirble].each do |g|
+%w[rubygems interactive_editor].each do |g|
   begin
     require g
   rescue LoadError
@@ -17,14 +11,12 @@ IRB.conf[:PROMPT_MODE] = :SIMPLE
   end
 end
 
-Looksee.editor = "mate -l%l %f" if defined? Looksee
-
 # Prompt behavior
 ARGV.concat [ "--readline", "--prompt-mode", "simple" ]
 
 # History
 require 'irb/ext/save-history'
-IRB.conf[:SAVE_HISTORY] = 100
+IRB.conf[:SAVE_HISTORY] = 10000
 IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb-save-history"
 
 # Easily print methods local to an object's class
@@ -32,7 +24,7 @@ class Object
   def local_methods(obj = self)
     (obj.methods - obj.class.superclass.instance_methods).sort
   end
-  
+
   # print documentation
   #
   #   ri 'Array#pop'
@@ -63,3 +55,13 @@ end
 def paste
   `pbpaste`
 end
+
+def quick(repetitions=100, &block)
+  require 'benchmark'
+
+  Benchmark.bmbm do |b|
+    b.report {repetitions.times &block}
+  end
+  nil
+end
+

@@ -1,12 +1,13 @@
 [push]
-  default = tracking
+  default = current
 [color]
   diff = auto
   status = auto
   branch = auto
+  ui = 1
 [core]
   excludesfile = ~/.gitignore
-  editor = e -w
+  editor = subl -w
   autocrlf = input
 [format]
   pretty = %Cblue%h%Creset %Cgreen[%cr]%Creset (%an) %s
@@ -39,8 +40,13 @@
   rb = rebase
   f = flow
   su = submodule update --init --recursive --quiet
+  who = blame -CCCw
 [user]
   name = hamsharan
   email = hamsharan@gmail.com
 [branch]
-	autosetuprebase = always
+  autosetuprebase = always
+[credential]
+  helper = osxkeychain
+[help]
+  autocorrect = 1

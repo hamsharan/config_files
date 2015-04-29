@@ -2,6 +2,32 @@
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+Bundle 'gmarik/vundle'
+
+" adds awesome statusbar
+Bundle 'Lokaltog/vim-powerline'
+" adds file tree
+Bundle 'scrooloose/nerdtree'
+" automatically end if's with end's etc
+Bundle 'tpope/vim-endwise'
+" vim-rails, the
+Bundle 'tpope/vim-rails'
+" surround stuff with brackets and stuff
+Bundle 'tpope/vim-surround'
+" just like in TextMate, open files
+Bundle 'git://git.wincent.com/command-t.git'
+" vivid chalk color scheme
+Bundle 'tpope/vim-vividchalk'
+
+
+" open a NERDTree automatically when directory is opened
+autocmd vimenter * if !argc() | NERDTree | endif
+" close vim when NERDTree is the only window left
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif
+
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
 
@@ -153,7 +179,7 @@ if executable("ack")
 endif
 
 " Color scheme
-colorscheme vividchalk
+"colorscheme vividchalk
 highlight NonText guibg=#060606
 highlight Folded  guibg=#0A0A0A guifg=#9090D0
 

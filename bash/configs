@@ -1,50 +1,35 @@
-# make GO compile
-if [ -d "/usr/local/Library" ]; then
-  export GOROOT=`brew --cellar`/go/HEAD
-  export GOBIN=/usr/local/bin
-  export GOARCH=amd64
-  export GOOS=darwin
-fi
+shopt -s histappend
 
-export EDITOR="e -w"
+export EDITOR="subl -w"
 
 export HISTCONTROL=ignoredups
 export HISTSIZE=100000
 shopt -s checkwinsize
 
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
-[[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"  # This loads system-wide RVM into a shell session.
 if [ -s "$HOME/.rbenv" ]; then
   export PATH="$HOME/.rbenv/bin:$PATH"  # This loads Rbenv
   eval "$(rbenv init -)"
 fi
 
+if [ -s "/usr/local/opt/chruby/share/chruby/chruby.sh" ]; then
+  source /usr/local/opt/chruby/share/chruby/chruby.sh
+  source /usr/local/opt/chruby/share/chruby/auto.sh
+fi
+
 # Make C-a/C-e work as home/end
 set -o emacs
 
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD/$HOME/~}\007"'
-    ;;
-*)
-    ;;
-esac
-
 GREEN="\[\033[0;32m\]"
 WHITE="\[\033[1;37m\]"
+RED="\[\033[1;31m\]"
 NONE="\[\033[0m\]"
-
-function _parse_git_dirty {
-  [[ $(git status 2> /dev/null | tail -n1) != "nothing to commit (working directory clean)" ]] && echo "*"
-}
 
 function _parse_git_stash {
   git stash list 2> /dev/null | wc -l | awk '{print $1}'
 }
 
 function _parse_git_branch {
-  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1$(_parse_git_dirty)^$(_parse_git_stash) /"
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1^$(_parse_git_stash) /"
 }
 
 function _parse_git_part {
@@ -52,7 +37,7 @@ function _parse_git_part {
 }
 
 function _parse_ruby_version {
-  ruby -v 2>/dev/null | awk '{print$2}'
+  rbenv version-name
 }
 
 function _parse_ruby_part {
@@ -63,4 +48,27 @@ function _print_prompt {
   printf "$(_parse_git_part)$(_parse_ruby_part)"
 }
 
-PS1="\n\h:$GREEN\w$NONE \$(_print_prompt)\n# "
+function exitstatus {
+  EXITSTATUS="$?"
+
+  if [ "$EXITSTATUS" -eq "0" ]
+  then
+    PS1="\n$GREEN\w$NONE \$(_print_prompt)\n${GREEN}✔$NONE "
+  else
+    PS1="\n$RED\w$NONE \$(_print_prompt)\n${RED}✘$NONE "
+  fi
+  echo -ne "\033]0;${PWD##*/}\007"
+}
+
+PROMPT_COMMAND=exitstatus
+
+export RUBY_GC_HEAP_INIT_SLOTS=600000
+export RUBY_GC_HEAP_FREE_SLOTS=600000
+export RUBY_GC_HEAP_GROWTH_FACTOR=1.25
+export RUBY_GC_HEAP_GROWTH_MAX_SLOTS=300000
+
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
+export LOLCOMMITS_FORK=1
+export LOLCOMMITS_DELAY=10

@@ -37,11 +37,8 @@ function tman {
 # rails stuff
 alias migrate="rake db:migrate"
 alias remigrate="rake db:migrate && rake db:migrate:redo"
-alias sc='script/console'
-alias ss='script/server'
-alias sg='script/generate'
 alias tlog='tail -f log/development.log'
-alias bi='bundle install --binstubs=,'
+alias bi='bundle install --binstubs=, --path=.bundle/gems'
 alias bu='bundle update'
 
 # git stuff
@@ -52,6 +49,34 @@ g() {
     git "$@"
   fi
 }
+
+gpr() {
+  originurl=$(git config --get remote.origin.url)
+  originurl=${originurl/git\@github\.com\:/https://github.com/}
+  originurl=${originurl/\git:/https:}
+  originurl=${originurl/\.git/}
+  branchName=$(git rev-parse --abbrev-ref HEAD)
+  giturl=$originurl"/compare/"$branchName"?expand=1"
+  open $giturl
+}
+
+gbr() {
+  originurl=$(git config --get remote.origin.url | tr '[:upper:]' '[:lower:]')
+  originurl=${originurl/git\@bitbucket\.org\:/https://bitbucket.org/}
+  originurl=${originurl/\git:/https:}
+  originurl=${originurl/\.git/}
+
+  path=$(git config --get remote.origin.url | tr '[:upper:]' '[:lower:]' | sed -e 's/git@bitbucket.org://')
+
+  branchName=$(git rev-parse --abbrev-ref HEAD)
+  giturl=$originurl"/pull-request/new?source="$path"::"$branchName
+  open $giturl
+}
+
+gbc() {
+  git branch --merged | grep -v "\*" | xargs -n 1 git branch -d
+}
+
 alias gadd="git add -u && git add . && git status"
 alias gi="gem install"
 alias gs="git s"
@@ -59,6 +84,7 @@ alias ga="git a"
 alias gst="git st"
 alias gb="git b"
 alias gc="git c"
+alias gca="git ca"
 alias gd="git d"
 alias gdc="git dc"
 alias gpl="git pl"
@@ -71,17 +97,19 @@ alias grb="git rb"
 alias grc="git rc"
 alias gra="git ra"
 alias gf="git f"
+alias gup="git up"
 
 # git stash
 alias sta="git stash"
 alias uns="git stash pop"
 
 # file system stuff
-alias ls="ls -Fh"
-alias ll="ls -Al"
-alias l="ls -AF"
+alias ls="ls -FhG"
+alias ll="ls -AlG"
+alias l="ls -AFG"
 function c { cd ~/code/$1; }
 alias ..='cd ..'
+alias ...='cd ../..'
 
 # rails3 stuff
 alias r="rails"
@@ -98,9 +126,7 @@ alias tua="tmux attach -t"
 alias tun="tmux new -s"
 alias tus="tmux switch-client -t"
 
-alias v="vim"
-alias p="python"
-alias e.='e . &'
+alias e='subl .'
 
 # hack && ship
 alias hs="hack && ship"

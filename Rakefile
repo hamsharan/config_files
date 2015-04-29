@@ -29,7 +29,15 @@ task :install do
       link_file(file)
     end
   end
+
+  if File.exists?(File.expand_path('~/.vim/bundle/vundle'))
+    Kernel.exec 'cd ~/.vim/bundle/vundle && git pull'
+  else
+    Kernel.exec 'git clone http://github.com/gmarik/vundle.git ~/.vim/bundle/vundle'
+  end
 end
+
+task :default => :install
 
 def replace_file(file)
   system %Q{rm -rf "$HOME/.#{file}"}
